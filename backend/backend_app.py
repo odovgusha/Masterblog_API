@@ -68,7 +68,6 @@ def delete_post(id):
 def update_post(id):
     data = request.get_json()
 
-    # Find the post
     for post in POSTS:
         if post["id"] == id:
 
@@ -78,7 +77,7 @@ def update_post(id):
                     post["title"] = data["title"]
                 if "content" in data:
                     post["content"] = data["content"]
-
+            #print data
             return jsonify({
                 "id": post["id"],
                 "title": post["title"],
@@ -89,6 +88,23 @@ def update_post(id):
     return jsonify({
         "error": f"Post with id {id} was not found."
     }), 404
+
+
+@app.route('/api/posts/search', methods=['GET'])
+def search_posts():
+    title_query = request.args.get('title', '').lower()
+    content_query = request.args.get('content', '').lower()
+
+    results = []
+
+    for post in POSTS:
+        title_match = title_query in post["title"].lower()
+        content_match = content_query in post["content"].lower()
+        #print results
+        if title_match or content_match:
+            results.append(post)
+
+    return jsonify(results), 200
 
 
 if __name__ == '__main__':
